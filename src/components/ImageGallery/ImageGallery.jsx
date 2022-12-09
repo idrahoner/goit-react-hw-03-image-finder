@@ -3,6 +3,7 @@ import { PropTypes } from 'prop-types';
 import { createPortal } from 'react-dom';
 import ImageGalleryItem from 'components/ImageGalleryItem';
 import Modal from 'components/Modal';
+import Button from 'components/Button';
 import css from './ImageGallery.module.css';
 
 // import Api from 'service';
@@ -55,6 +56,10 @@ export default class ImageGallery extends Component {
     this.setState(prevState => ({ showModal: !prevState.showModal }));
   };
 
+  loadMore = () => {
+    console.log('This is load more button click');
+  };
+
   render() {
     // console.log('state for ImageGallery: ', this.state);
 
@@ -68,6 +73,7 @@ export default class ImageGallery extends Component {
             onClick={this.toggleModal}
           />
         </ul>
+        <Button onClick={this.loadMore} />
         {showModal &&
           createPortal(
             <Modal
