@@ -1,6 +1,7 @@
 import { Component } from 'react';
 
 import Searchbar from 'components/Searchbar';
+import ImageGallery from 'components/ImageGallery';
 
 export class App extends Component {
   state = {
@@ -12,18 +13,18 @@ export class App extends Component {
   };
 
   render() {
+    // console.log('App this.state: ', this.state.query);
     return (
       <div
         style={{
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
+          display: 'grid',
+          gridTemplateColumns: '1fr',
+          gridGap: '16px',
+          paddingBottom: '24px',
         }}
       >
         <Searchbar onSubmit={this.handleSearch} />
+        {this.state.query && <ImageGallery query={this.state.query} />}
       </div>
     );
   }
