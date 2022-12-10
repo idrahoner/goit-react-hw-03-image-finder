@@ -24,6 +24,7 @@ export default class ImageGallery extends Component {
     showLoader: false,
     hits: [],
     totalHits: 0,
+    forModal: null,
   };
 
   componentDidMount() {
@@ -51,11 +52,17 @@ export default class ImageGallery extends Component {
     }
   }
 
-  toggleModal = event => {
+  openModal = event => {
+    console.log('event.currentTarget.id: ', typeof event.currentTarget.id);
+    const modalElement = this.state.hits.find(
+      element => element.id === Number(event.currentTarget.id)
+    );
+    this.toggleModal();
+    this.setState({ forModal: modalElement });
+  };
+
+  toggleModal = () => {
     this.setState(prevState => ({ showModal: !prevState.showModal }));
-    console.log('event: ', event);
-    console.log('event.currentTarget: ', event.currentTarget);
-    console.log('event.target: ', event.target);
   };
 
   loadMore = () => {
@@ -71,16 +78,17 @@ export default class ImageGallery extends Component {
     // console.log('state for ImageGallery: ', this.state);
     // console.log('props for ImageGallery: ', this.props);
 
-    const { showModal, showLoader, hits, totalHits } = this.state;
+    const { showModal, showLoader, hits, totalHits, forModal } = this.state;
     return (
       <>
         <ul className={css.imageGallery}>
           {hits.map(element => (
             <ImageGalleryItem
               key={element.id}
+              id={element.id}
               webImage={element.webformatURL}
               description={element.tags}
-              onClick={this.toggleModal}
+              onClick={this.openModal}
             />
           ))}
         </ul>
@@ -97,8 +105,8 @@ export default class ImageGallery extends Component {
         {showModal &&
           createPortal(
             <Modal
-              largeImage="blablabla"
-              description="blablabla"
+              largeImage={forModal.largeImageURL}
+              description={forModal.tags}
               onClose={this.toggleModal}
             />,
             modalPortal
