@@ -6,10 +6,10 @@ export default class Api {
   orientation = 'horizontal';
   safesearch = true;
   page = 1;
-  per_page = 40;
+  per_page = 5;
 
   setQuery(newQuery) {
-    this.query += newQuery;
+    this.query = newQuery;
   }
 
   increasePage() {
@@ -32,12 +32,14 @@ export default class Api {
   async makeRequest() {
     const response = await fetch(this.getURL());
 
-    if (response.status.ok) {
+    if (response.ok) {
       return response.json();
     }
 
     return Promise.reject(
-      'Sorry, there are no images matching your search query. Please try again.'
+      new Error(
+        'Sorry, there are no images matching your search query. Please try again.'
+      )
     );
   }
 }

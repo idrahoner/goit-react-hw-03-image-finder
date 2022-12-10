@@ -18,7 +18,10 @@ export default class Searcbar extends Component {
   handleSubmit = event => {
     event.preventDefault();
     const { input } = this.state;
-    this.props.onSubmit(input);
+    const normalizedInput = input.trim().toLowerCase();
+    if (normalizedInput) {
+      this.props.onSubmit(normalizedInput);
+    }
     this.setState({ input: '' });
   };
 
