@@ -36,9 +36,8 @@ export default class ImageGallery extends Component {
     status: galleryStatus.idle,
   };
 
-  componentDidUpdate(pervProps, pervState) {
-    if (pervProps.query !== this.props.query) {
-      // console.log('changed props');
+  componentDidUpdate(prevProps) {
+    if (prevProps.query !== this.props.query) {
       this.setState({ status: galleryStatus.pending });
       api.setQuery(this.props.query);
       api
@@ -54,14 +53,18 @@ export default class ImageGallery extends Component {
           this.setState({ error, status: galleryStatus.rejected });
         });
     }
+
+    if (this.state.status === galleryStatus.rejected) {
+      this.setState({ status: galleryStatus.idle });
+    }
   }
 
   loadMore = () => {
     api.increasePage();
     api.makeRequest().then(({ hits }) =>
-      this.setState(pervState => ({
+      this.setState(prevState => ({
         hits: [
-          ...pervState.hits,
+          ...prevState.hits,
           ...hits.map(element => formatResponse(element)),
         ],
       }))
@@ -82,9 +85,6 @@ export default class ImageGallery extends Component {
   render() {
     const { hits, totalHits, modalImage, status, error } = this.state;
 
-    console.log(this.state);
-    // console.log(this.props);
-
     if (status === galleryStatus.idle) {
       return null;
     }
@@ -100,7 +100,10 @@ export default class ImageGallery extends Component {
           glassColor="#c0efff"
           color="#e15b64"
           wrapperStyle={{
-            margin: 'auto',
+            position: 'fixed',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
           }}
         />
       );

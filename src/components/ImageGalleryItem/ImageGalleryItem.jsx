@@ -7,14 +7,12 @@ export default function ImageGalleryItem({
   onClick,
   id,
 }) {
-  // console.log('description: ', description);
   return (
     <li className={css.imageGalleryItem} onClick={onClick} id={id}>
       <img
         className={css.imageGalleryItemImage}
         src={webImage}
         alt={description}
-        width="240"
       />
     </li>
   );

@@ -21,7 +21,6 @@ export default class Modal extends Component {
   }
 
   closeModal = event => {
-    console.log(event.target);
     if (event.currentTarget === event.target || event.code === ESCAPE_KEY) {
       event.preventDefault();
       this.props.onClose();
