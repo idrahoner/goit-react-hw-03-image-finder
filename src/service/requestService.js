@@ -8,7 +8,7 @@ export class FindImageApi {
   orientation = 'horizontal';
   safesearch = true;
   page = 1;
-  per_page = 5;
+  per_page = 12;
 
   setQuery(newQuery) {
     this.query = newQuery;
