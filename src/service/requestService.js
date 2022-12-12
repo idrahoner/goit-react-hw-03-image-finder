@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export default class Api {
+export class FindImageApi {
   url = 'https://pixabay.com/api/';
   key = '30965051-be301043694ab243532f6a4d6';
   query = '';
@@ -37,12 +37,16 @@ export default class Api {
       },
     });
 
-    if (data.totalHits === 0) {
-      throw new Error(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    }
-
     return data;
+  }
+
+  search(query) {
+    this.setQuery(query);
+    return this.makeRequest();
+  }
+
+  loadMore() {
+    this.increasePage();
+    return this.makeRequest();
   }
 }
