@@ -12,6 +12,7 @@ export default class Api {
 
   setQuery(newQuery) {
     this.query = newQuery;
+    this.page = 1;
   }
 
   increasePage() {
@@ -24,7 +25,7 @@ export default class Api {
   }
 
   async makeRequest() {
-    const response = await axios.get(this.url, {
+    const { data } = await axios.get(this.url, {
       params: {
         key: this.key,
         q: this.query,
@@ -36,6 +37,12 @@ export default class Api {
       },
     });
 
-    return response.data;
+    if (data.totalHits === 0) {
+      throw new Error(
+        'Sorry, there are no images matching your search query. Please try again.'
+      );
+    }
+
+    return data;
   }
 }

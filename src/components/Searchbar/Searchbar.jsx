@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { HiMagnifyingGlass } from 'react-icons/hi2';
 import PropTypes from 'prop-types';
 import css from './Searchbar.module.css';
 
@@ -32,6 +33,7 @@ export default class Searcbar extends Component {
         <form className={css.searchForm} onSubmit={this.handleSubmit}>
           <button type="submit" className={css.searchFormButton}>
             <span className={css.searchFormButtonLabel}>Search</span>
+            <HiMagnifyingGlass size="2em" color="black" />
           </button>
 
           <input

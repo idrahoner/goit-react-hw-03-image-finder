@@ -29,62 +29,32 @@ export default class ImageGallery extends Component {
   };
 
   state = {
-    query: '',
-    showModal: false,
+    error: null,
     hits: [],
     totalHits: 0,
-    forModal: null,
+    modalImage: null,
     status: galleryStatus.idle,
   };
 
-  componentDidMount() {
-    this.setState({ query: this.props.query });
-  }
-
-  componentDidUpdate(pervProps, prevState) {
+  componentDidUpdate(pervProps, pervState) {
     if (pervProps.query !== this.props.query) {
-      this.setState({ query: this.props.query });
-    }
-
-    if (prevState.query !== this.state.query) {
-      this.createRequest(this.state.query);
+      // console.log('changed props');
+      this.setState({ status: galleryStatus.pending });
+      api.setQuery(this.props.query);
+      api
+        .makeRequest()
+        .then(({ hits, totalHits }) => {
+          this.setState({
+            hits: hits.map(element => formatResponse(element)),
+            totalHits,
+            status: galleryStatus.resolved,
+          });
+        })
+        .catch(error => {
+          this.setState({ error, status: galleryStatus.rejected });
+        });
     }
   }
-
-  createRequest = query => {
-    this.setState({ status: galleryStatus.pending });
-    api.reset();
-    api.setQuery(query);
-    api
-      .makeRequest()
-      .then(({ hits, totalHits }) => {
-        if (totalHits === 0) {
-          throw new Error(
-            'Sorry, there are no images matching your search query. Please try again.'
-          );
-        }
-        this.setState({
-          hits: hits.map(element => formatResponse(element)),
-          totalHits,
-          status: galleryStatus.resolved,
-        });
-      })
-      .catch(() => {
-        this.setState({ status: galleryStatus.rejected });
-      });
-  };
-
-  openModal = event => {
-    const modalElement = this.state.hits.find(
-      element => element.id === Number(event.currentTarget.id)
-    );
-    this.toggleModal();
-    this.setState({ forModal: modalElement });
-  };
-
-  toggleModal = () => {
-    this.setState(prevState => ({ showModal: !prevState.showModal }));
-  };
 
   loadMore = () => {
     api.increasePage();
@@ -98,11 +68,22 @@ export default class ImageGallery extends Component {
     );
   };
 
-  render() {
-    // console.log('state for ImageGallery: ', this.state);
-    // console.log('props for ImageGallery: ', this.props);
+  openModal = event => {
+    const modalElement = this.state.hits.find(
+      element => element.id === Number(event.currentTarget.id)
+    );
+    this.setState({ modalImage: modalElement });
+  };
 
-    const { showModal, hits, totalHits, forModal, status } = this.state;
+  closeModal = () => {
+    this.setState({ modalImage: null });
+  };
+
+  render() {
+    const { hits, totalHits, modalImage, status, error } = this.state;
+
+    console.log(this.state);
+    // console.log(this.props);
 
     if (status === galleryStatus.idle) {
       return null;
@@ -118,12 +99,15 @@ export default class ImageGallery extends Component {
           wrapperClass="MagnifyingGlass-wrapper"
           glassColor="#c0efff"
           color="#e15b64"
+          wrapperStyle={{
+            margin: 'auto',
+          }}
         />
       );
     }
 
     if (status === galleryStatus.rejected) {
-      return toast.error('Something went wrong :(');
+      return toast.error(error.message);
     }
 
     if (status === galleryStatus.resolved) {
@@ -142,12 +126,12 @@ export default class ImageGallery extends Component {
           </ul>
 
           {hits.length < totalHits && <Button onClick={this.loadMore} />}
-          {showModal &&
+          {modalImage &&
             createPortal(
               <Modal
-                largeImage={forModal.largeImageURL}
-                description={forModal.tags}
-                onClose={this.toggleModal}
+                largeImage={modalImage.largeImageURL}
+                description={modalImage.tags}
+                onClose={this.closeModal}
               />,
               modalPortal
             )}
