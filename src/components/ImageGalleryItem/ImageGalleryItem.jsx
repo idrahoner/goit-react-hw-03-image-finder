@@ -8,7 +8,7 @@ export default function ImageGalleryItem({
   id,
 }) {
   return (
-    <li className={css.imageGalleryItem} onClick={onClick} id={id}>
+    <li className={css.imageGalleryItem} onClick={() => onClick(id)}>
       <img
         className={css.imageGalleryItemImage}
         src={webImage}

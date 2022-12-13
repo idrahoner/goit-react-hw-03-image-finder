@@ -21,15 +21,7 @@ export default class GalleryViewer extends Component {
   };
 
   componentDidMount() {
-    const { totalHits } = this.props;
-
-    if (totalHits === 0) {
-      toast.error(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    } else {
-      toast.success(`Hooray! We found ${totalHits} images.`);
-    }
+    toast.success(`Hooray! We found ${this.props.totalHits} images.`);
   }
 
   componentDidUpdate(prevProps) {
@@ -43,9 +35,9 @@ export default class GalleryViewer extends Component {
     }
   }
 
-  openModal = event => {
+  openModal = id => {
     const modalElement = this.props.hits.find(
-      element => element.id === Number(event.currentTarget.id)
+      element => element.id === Number(id)
     );
     this.setState({ modalElement });
   };

@@ -23,14 +23,14 @@ export default class ImageSearcher extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { query: propsQuery } = this.props;
-    const { query: stateQuery, page: statePage } = this.state;
+    const { query, page } = this.state;
 
     if (prevProps.query !== propsQuery) {
       this.prepareState(propsQuery);
     }
 
-    if (prevState.query !== stateQuery || prevState.page !== statePage) {
-      this.makeRequest(stateQuery, statePage);
+    if (prevState.query !== query || prevState.page !== page) {
+      this.makeRequest(query, page);
     }
   }
 
@@ -41,6 +41,13 @@ export default class ImageSearcher extends Component {
   async makeRequest(query, page) {
     try {
       const { hits, totalHits } = await fetchImages({ query, page });
+
+      if (!totalHits) {
+        throw new Error(
+          'Sorry, there are no images matching your search query. Please try again.'
+        );
+      }
+
       this.setState(prevState => ({
         hits: [
           ...prevState.hits,
@@ -67,6 +74,8 @@ export default class ImageSearcher extends Component {
 
   render() {
     const { hits, totalHits, status } = this.state;
+
+    console.log(this.state);
 
     if (status === idle) {
       return null;
