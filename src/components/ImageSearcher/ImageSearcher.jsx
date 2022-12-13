@@ -75,8 +75,6 @@ export default class ImageSearcher extends Component {
   render() {
     const { hits, totalHits, status } = this.state;
 
-    console.log(this.state);
-
     if (status === idle) {
       return null;
     }
