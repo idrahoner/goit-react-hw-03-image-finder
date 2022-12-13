@@ -4,9 +4,7 @@ import { toast } from 'react-toastify';
 
 import GalleryViewer from 'components/GalleryViewer';
 import Loader from 'components/Loader';
-import { FindImageApi, formatResponse, searchStatus } from 'service';
-
-const imageApi = new FindImageApi();
+import { fetchImages, formatResponse, searchStatus } from 'service';
 
 const { idle, pending, resolved } = searchStatus;
 
@@ -16,50 +14,56 @@ export default class ImageSearcher extends Component {
   };
 
   state = {
+    query: '',
+    page: 1,
     hits: [],
     totalHits: 0,
     status: idle,
   };
 
-  componentDidUpdate(prevProps) {
-    const { query } = this.props;
+  componentDidUpdate(prevProps, prevState) {
+    const { query: propsQuery } = this.props;
+    const { query: stateQuery, page: statePage } = this.state;
 
-    if (prevProps.query !== query) {
-      this.setState({
-        hits: [],
-        totalHits: 0,
-        status: pending,
-      });
-      imageApi.setQuery(query);
-      this.handleRequest();
+    if (prevProps.query !== propsQuery) {
+      this.prepareState(propsQuery);
+    }
+
+    if (prevState.query !== stateQuery || prevState.page !== statePage) {
+      this.makeRequest(stateQuery, statePage);
     }
   }
 
   loadMore = () => {
-    imageApi.increasePage();
-    this.handleRequest(this.props.query);
+    this.setState(prevState => ({ page: prevState.page + 1 }));
   };
 
-  handleRequest = () => {
-    imageApi
-      .makeRequest()
-      .then(this.onSuccessRequest)
-      .catch(error => {
-        this.setState({ status: idle });
-        toast.error(error.message);
-      });
-  };
+  async makeRequest(query, page) {
+    try {
+      const { hits, totalHits } = await fetchImages({ query, page });
+      this.setState(prevState => ({
+        hits: [
+          ...prevState.hits,
+          ...hits.map(element => formatResponse(element)),
+        ],
+        totalHits,
+        status: resolved,
+      }));
+    } catch (error) {
+      this.setState({ status: idle });
+      toast.error(error.message);
+    }
+  }
 
-  onSuccessRequest = ({ hits, totalHits }) => {
-    this.setState(prevState => ({
-      hits: [
-        ...prevState.hits,
-        ...hits.map(element => formatResponse(element)),
-      ],
-      totalHits,
-      status: resolved,
-    }));
-  };
+  prepareState(query) {
+    this.setState({
+      query,
+      page: 1,
+      hits: [],
+      totalHits: 0,
+      status: pending,
+    });
+  }
 
   render() {
     const { hits, totalHits, status } = this.state;
